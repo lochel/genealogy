@@ -1,3 +1,4 @@
+import ast
 import json
 import os
 import secrets
@@ -228,12 +229,12 @@ def relative_edit(relative_hash):
   if request.method == 'GET':
     return render_template('relative_edit.html', relative=relative)
 
-  relative['hash'] = request.form['hash']
+  new_hash = request.form['hash']
   relative['name'] = request.form['name']
   relative['sex'] = request.form['sex']
   relative['father'] = request.form['father']
   relative['mother'] = request.form['mother']
-  relative['spouse'] = [s.strip()[1:-1] for s in request.form['spouse'][1:-1].split(',')]
+  relative['spouse'] = ast.literal_eval(request.form['spouse'])
   relative['birthday'] = request.form['birthday']
   relative['birthplace'] = request.form['birthplace']
   relative['weddingDay'] = request.form['weddingDay']
@@ -242,14 +243,101 @@ def relative_edit(relative_hash):
   relative['placeOfDeath'] = request.form['placeOfDeath']
   relative['profession'] = request.form['profession']
 
-  if relative_hash != relative['hash']:
-    # TODO: Update all references
-    pass
+  # Check that the new hash isn't already used
+  if relative_hash != new_hash:
+    for r in relatives:
+      if new_hash == r['hash']:
+        flash('Warning: Unable to modify hash, as it already exists.')
+        return redirect(url_for('relative', relative_hash=relative_hash))
 
-  # TODO: Check all cross-references
+  if relative['father']:
+    found = False
+    for r in relatives:
+      if relative['father'] == r['hash']:
+        found = True
+        break
+    if not found:
+      flash('Warning: Unable to find father, invalid cross-reference')
+      return redirect(url_for('relative', relative_hash=relative_hash))
+
+  if relative['mother']:
+    found = False
+    for r in relatives:
+      if relative['mother'] == r['hash']:
+        found = True
+        break
+    if not found:
+      flash('Warning: Unable to find mother, invalid cross-reference')
+      return redirect(url_for('relative', relative_hash=relative_hash))
+
+  for spouse in relative['spouse']:
+    found = False
+    for r in relatives:
+      if spouse == r['hash']:
+        found = True
+        break
+    if not found:
+      flash(f'Warning: Unable to find spouse "{spouse}", invalid cross-reference')
+      return redirect(url_for('relative', relative_hash=relative_hash))
+
+  # Change all cross-references
+  for r in relatives:
+    need_to_be_updated = False
+    if r['father'] == relative_hash:
+      need_to_be_updated = True
+      r['father'] = new_hash
+    if r['mother'] == relative_hash:
+      need_to_be_updated = True
+      r['mother'] = new_hash
+    if relative_hash in r['spouse']:
+      need_to_be_updated = True
+      r['spouse'] = [s if s != relative_hash else new_hash for s in r['spouse']]
+    if need_to_be_updated:
+      write_relative(r)
+      flash(f'Info: Cross-references updated for "{r["hash"]}"')
+
+  if relative_hash != new_hash:
+    relative['hash'] = new_hash
+    os.rename('data/relatives/' + relative_hash + '.md', 'data/relatives/' + relative['hash'] + '.md')
+    relative_hash = relative['hash']
 
   write_relative(relative)
   return redirect(url_for('relative', relative_hash=relative_hash))
+
+@app.route('/validate')
+@flask_login.login_required
+def validate():
+  relatives = {}
+  warnings = []
+
+  # import all data
+  for root, _, files in os.walk('data/relatives/', topdown=False):
+    for name in files:
+      if name.endswith('.md'):
+        try:
+          relative = read_relative(os.path.join(root, name))
+          if relative['hash'] != name[:-3]:
+            warnings.append('Wrong filename ' + os.path.join(root, name))
+        except:
+          warnings.append('Failed to read ' + os.path.join(root, name))
+        else:
+          relatives[relative['hash']] = relative
+
+  for relative in relatives.values():
+    if relative['father'] and relative['father'] not in relatives:
+      warnings.append(relative['hash'] + " has an invalid cross-reference to their father " + relative['father'])
+    if relative['mother'] and relative['mother'] not in relatives:
+      warnings.append(relative['hash'] + " has an invalid cross-reference to their mother " + relative['mother'])
+    for spouse in relative['spouse']:
+      if not spouse:
+        warnings.append(relative['hash'] + " contains an empty spouse entry")
+      else:
+        if spouse not in relatives:
+          warnings.append(relative['hash'] + " has an invalid cross-reference to their spouse " + spouse)
+        if relative['hash'] not in relatives[spouse]['spouse']:
+          warnings.append(spouse + " is missing a cross-reference to their spouse " + relative['hash'])
+
+  return f'{len(relatives)} relatives, {len(warnings)} warnings</br></br>' + '</br>'.join(warnings)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -364,18 +452,6 @@ def apple_touch_icon():
 @app.route('/apple-touch-icon-precomposed.png')
 def apple_touch_icon_precomposed():
   return send_from_directory(app.static_folder, 'favicon/apple-touch-icon.png', mimetype='image/png')
-
-@app.route('/trips/pin-icon-start.png')
-def pin_icon_start():
-  return send_from_directory(app.static_folder, 'icons/pin-icon-start.png', mimetype='image/png')
-
-@app.route('/trips/pin-icon-end.png')
-def pin_icon_end():
-  return send_from_directory(app.static_folder, 'icons/pin-icon-end.png', mimetype='image/png')
-
-@app.route('/trips/pin-shadow.png')
-def pin_shadow():
-  return send_from_directory(app.static_folder, 'icons/pin-shadow.png', mimetype='image/png')
 
 @app.route('/robots.txt')
 def robots():

@@ -2,6 +2,19 @@
 {% set title = relative.title %}
 
 {% block section %}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <section>
+    <h4>Notification</h4>
+    <ul class="alt">
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+{% endwith %}
+
 <!-- Content -->
 <section>
   <header class="main">

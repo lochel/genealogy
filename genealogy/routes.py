@@ -211,6 +211,8 @@ def relative_edit(relative_hash):
   if request.method == 'GET':
     return render_template('relative_edit.html', relative=relative)
 
+  relative['hash'] = request.form['hash']
+  relative['name'] = request.form['name']
   relative['sex'] = request.form['sex']
   relative['father'] = request.form['father']
   relative['mother'] = request.form['mother']
@@ -222,6 +224,10 @@ def relative_edit(relative_hash):
   relative['dayOfDeath'] = request.form['dayOfDeath']
   relative['placeOfDeath'] = request.form['placeOfDeath']
   relative['profession'] = request.form['profession']
+
+  if relative_hash != relative['hash']:
+    # TODO: Update all references
+    pass
 
   # TODO: Check all cross-references
   write_relative(relative)

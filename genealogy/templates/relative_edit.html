@@ -18,6 +18,14 @@
     <div class="col-6 col-12-small">
       <form method="post" action="#">
         <div class="col-6 col-12-xsmall">
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="hash" id="hash" value="{{ relative.hash }}" placeholder="hash" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="name" id="name" value="{{ relative.name }}" placeholder="name" />
+          </div>
+          <!-- Break -->
           <select name="sex" id="sex">
             {% if relative.sex == "" %}
             <option value="" selected></option>

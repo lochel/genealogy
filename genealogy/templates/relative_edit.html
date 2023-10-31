@@ -11,7 +11,13 @@
   <div class="row">
     <div class="col-6 col-12-small">
       <span class="image fit"><img src="/static/images/relatives/{{ relative.image }}" alt="" />
-        <div class="badge">{{ relative.birthday }}</div>
+        <div class="badge">
+          {% if relative.dayOfDeath %}
+          {{ relative.birthday }} - {{ relative.dayOfDeath }}
+          {% else %}
+          {{ relative.birthday }}
+          {% endif %}
+        </div>
       </span>
     </div>
 

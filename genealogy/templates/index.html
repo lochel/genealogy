@@ -54,7 +54,11 @@
       <a href="/relatives/{{ relative.hash }}" class="image">
         <img src="/static/images/relatives/{{ relative.image }}" alt="" />
         <div class="badge">
+          {% if relative.dayOfDeath %}
+          {{ relative.birthday }} - {{ relative.dayOfDeath }}
+          {% else %}
           {{ relative.birthday }}
+          {% endif %}
         </div>
       </a>
       <h3>{{ relative.name }}</h3>

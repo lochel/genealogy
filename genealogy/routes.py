@@ -1,7 +1,7 @@
 import json
 import os
 import secrets
-from datetime import datetime
+from datetime import date, datetime
 
 import flask_login
 import markdown
@@ -60,10 +60,20 @@ def read_relative(filename):
   return relative
 
 def get_birthday(relative):
-  return relative['birthday']
+  birthday = relative['birthday']
+  try:
+    if len(birthday.split('.')) == 3:
+      birthday = birthday.split('.')
+      return date(birthday[2], birthday[1], birthday[0])
+    if len(birthday.split('-')) == 3:
+      birthday = birthday.split('-')
+      return date(birthday[0], birthday[1], birthday[2])
+  except:
+    pass
+  return date.today()
 
 def read_all_relatives(max_posts=-1, reverse=True):
-  posts = []
+  relatives = []
 
   for root, _, files in os.walk('data/relatives/', topdown=False):
     for name in files:
@@ -73,12 +83,12 @@ def read_all_relatives(max_posts=-1, reverse=True):
         except:
           pass
         else:
-          posts.append(post)
+          relatives.append(post)
 
-  posts.sort(key=get_birthday, reverse=reverse)
+  relatives.sort(key=get_birthday, reverse=reverse)
   if max_posts > 0:
-    return posts[0:max_posts]
-  return posts
+    return relatives[0:max_posts]
+  return relatives
 
 def createDirIfNeeded(dir):
   if not os.path.exists(dir):
@@ -122,7 +132,7 @@ def after_request(response):
 
 @app.route('/')
 def index():
-  relatives = read_all_relatives(2)
+  relatives = read_all_relatives(4, reverse=True)
   return render_template('index.html', relatives=relatives)
 
 @app.route('/generic')
@@ -219,9 +229,9 @@ def contact():
     comments = []
     users = []
 
-    if not flask_login.current_user.is_anonymous and flask_login.current_user.role == "skipper":
-      comments = [read_post(os.path.join(DIR, name)) for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]
-      comments.sort(key=get_birthday, reverse=True)
+    if not flask_login.current_user.is_anonymous and flask_login.current_user.role == "admin":
+      #comments = [read_post(os.path.join(DIR, name)) for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]
+      #comments.sort(key=get_birthday, reverse=True)
 
       for email, user in load_users().items():
         users.append({'email': email, 'name': user['name'], 'rank': user['role']})

@@ -13,9 +13,23 @@
     <div class="badge">{{ relative.birthday }}</div>
   </span>
 
-  {% if relative.profession %}
-  <blockquote>{{ relative.profession }}</blockquote>
-  {% endif %}
+  <ul class="alt">
+    <li><b>sex:</b> {{ relative.sex }}</li>
+    <li><b>father:</b> <a href="/relatives/{{ relative.father }}">{{ relative.father }}</a></li>
+    <li><b>mother:</b> <a href="/relatives/{{ relative.mother }}">{{ relative.mother }}</a></li>
+    <li><b>spouse:</b>
+      {% for spouse in relative.spouse %}
+      <a href="/relatives/{{ spouse }}">{{ spouse }}</a>
+      {% endfor %}
+    </li>
+    <li><b>birthday:</b> {{ relative.birthday }}</li>
+    <li><b>birthplace:</b> {{ relative.birthplace }}</li>
+    <li><b>weddingDay:</b> {{ relative.weddingDay }}</li>
+    <li><b>weddingPlace:</b> {{ relative.weddingPlace }}</li>
+    <li><b>dayOfDeath:</b> {{ relative.dayOfDeath }}</li>
+    <li><b>placeOfDeath:</b> {{ relative.placeOfDeath }}</li>
+    <li><b>profession:</b> {{ relative.profession }}</li>
+  </ul>
 
   {{ relative.body | safe }}
 </section>

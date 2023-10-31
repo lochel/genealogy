@@ -68,7 +68,10 @@ def get_relative_name(hash):
 
   try:
     relative = read_relative(os.path.join('data/relatives/', hash + '.md'))
-    return relative['name']
+    if relative['name']:
+      return relative['name']
+    else:
+      return hash
   except:
     return 'Failed to resolve hash: ' + hash
 
@@ -129,7 +132,7 @@ def empty_relative(hash):
               'sex': '',
               'father': '',
               'mother': '',
-              'spouse': '',
+              'spouse': [],
               'birthday': '',
               'birthplace': '',
               'weddingDay': '',
@@ -137,7 +140,7 @@ def empty_relative(hash):
               'dayOfDeath': '',
               'placeOfDeath': '',
               'profession': '',
-              'image': ''}
+              'image': 'unknown.png'}
   return relative
 
 def createDirIfNeeded(dir):
@@ -196,11 +199,13 @@ def elements():
   return render_template('elements.html')
 
 @app.route('/relatives')
+@flask_login.login_required
 def relatives():
   relatives = read_all_relatives()
   return render_template('relatives.html', relatives=relatives)
 
 @app.route('/relatives/<relative_hash>')
+@flask_login.login_required
 def relative(relative_hash):
   relatives = read_all_relatives()
   relative = [p for p in relatives if p['hash'] == relative_hash]
@@ -211,6 +216,7 @@ def relative(relative_hash):
   return render_template('relative.html', relative=relative)
 
 @app.route('/relatives/<relative_hash>/edit', methods=['GET', 'POST'])
+@flask_login.login_required
 def relative_edit(relative_hash):
   relatives = read_all_relatives()
   relative = [p for p in relatives if p['hash'] == relative_hash]
@@ -227,7 +233,7 @@ def relative_edit(relative_hash):
   relative['sex'] = request.form['sex']
   relative['father'] = request.form['father']
   relative['mother'] = request.form['mother']
-  relative['spouse'] = [s[1:-1].strip() for s in request.form['spouse'][1:-1].split(',')]
+  relative['spouse'] = [s.strip()[1:-1] for s in request.form['spouse'][1:-1].split(',')]
   relative['birthday'] = request.form['birthday']
   relative['birthplace'] = request.form['birthplace']
   relative['weddingDay'] = request.form['weddingDay']
@@ -241,6 +247,7 @@ def relative_edit(relative_hash):
     pass
 
   # TODO: Check all cross-references
+
   write_relative(relative)
   return redirect(url_for('relative', relative_hash=relative_hash))
 
@@ -296,6 +303,7 @@ def logout():
   return redirect(url_for('index'))
 
 @app.route('/search', methods=['GET', 'POST'])
+@flask_login.login_required
 def search():
   if not request.method == 'POST':
     return redirect(url_for('index'))

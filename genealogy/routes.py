@@ -1,10 +1,6 @@
-import hashlib
-import hmac
 import json
 import os
 import secrets
-import subprocess
-import traceback
 from datetime import datetime
 
 import flask_login
@@ -63,7 +59,7 @@ def read_relative(filename):
 def get_birthday(relative):
   return relative['birthday']
 
-def read_all_relatives(max_posts=-1, layout=None, reverse=True):
+def read_all_relatives(max_posts=-1, reverse=True):
   posts = []
 
   for root, _, files in os.walk('data/relatives/', topdown=False):
@@ -123,10 +119,8 @@ def after_request(response):
 
 @app.route('/')
 def index():
-  posts = read_all_relatives(2, layout='post')
-  projects = read_all_relatives(2, layout='todo', reverse=False)
-  nmea_status = {}
-  return render_template('index.html', posts=posts, projects=projects, nmea_status=nmea_status)
+  relatives = read_all_relatives(2)
+  return render_template('index.html', relatives=relatives)
 
 @app.route('/generic')
 @flask_login.login_required
@@ -140,7 +134,7 @@ def elements():
 
 @app.route('/relatives')
 def relatives():
-  relatives = read_all_relatives(layout='post')
+  relatives = read_all_relatives()
   return render_template('relatives.html', relatives=relatives)
 
 @app.route('/relatives/<relative_hash>')
@@ -210,11 +204,9 @@ def search():
 
   query = request.form['query']
 
-  all_posts = read_all_relatives()
-  all_posts = [post for post in all_posts if query.lower() in post['title'].lower()]
-  posts = [post for post in all_posts if post['layout'] == 'post']
-  projects = [] if flask_login.current_user.is_anonymous else [post for post in all_posts if post['layout'] == 'todo']
-  return render_template('search.html', posts=posts, projects=projects, query=query)
+  all_relatives = read_all_relatives()
+  all_relatives = [relative for relative in all_relatives if query.lower() in relative['name'].lower()]
+  return render_template('search.html', relatives=all_relatives, query=query)
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():

@@ -9,43 +9,21 @@
   </header>
 
   <header class="major">
-    <h2>Posts ({{ posts|length }})</h2>
+    <h2>Relatives ({{ relatives|length }})</h2>
   </header>
   <div class="posts">
-    {% for post in posts %}
+    {% for relative in relatives %}
     <article>
-      <a href="/posts/{{ post.id }}" class="image">
-        <img src="{{ post.img }}" alt="" />
+      <a href="/relatives/{{ relative.hash }}" class="image">
+        <img src="{{ relative.img }}" alt="" />
         <div class="badge">
-          {{ post.date }}
+          {{ relative.birthday }}
         </div>
       </a>
-      <h3>{{ post.title }}</h3>
-      <p>{{ post.description | truncate(200, killwords=False, end='...') }}</p>
+      <h3>{{ relative.name }}</h3>
+      <p>{{ relative.profession | truncate(200, killwords=False, end='...') }}</p>
     </article>
     {% endfor %}
   </div>
 </section>
-
-{% if projects %}
-<section>
-  <header class="major">
-    <h2>Projects ({{ projects|length }})</h2>
-  </header>
-  <div class="posts">
-    {% for post in projects %}
-    <article>
-      <a href="/posts/{{ post.id }}" class="image">
-        <img src="{{ post.img }}" alt="" />
-        <div class="badge">
-          {{ post.date }}
-        </div>
-      </a>
-      <h3>{{ post.title }}</h3>
-      <p>{{ post.description | truncate(200, killwords=False, end='...') }}</p>
-    </article>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
 {% endblock %}

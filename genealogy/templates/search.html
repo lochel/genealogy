@@ -5,17 +5,14 @@
 <!-- Content -->
 <section>
   <header class="major">
-    <h2>Search result for "{{ query }}"</h2>
+    <h2>Search result for "{{ query }}" ({{ relatives|length }})</h2>
   </header>
 
-  <header class="major">
-    <h2>Relatives ({{ relatives|length }})</h2>
-  </header>
   <div class="posts">
     {% for relative in relatives %}
     <article>
       <a href="/relatives/{{ relative.hash }}" class="image">
-        <img src="{{ relative.image }}" alt="" />
+        <img src="/static/images/relatives/{{ relative.image }}" alt="" />
         <div class="badge">
           {{ relative.birthday }}
         </div>

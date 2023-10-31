@@ -10,7 +10,7 @@
 
   <div class="row">
     <div class="col-6 col-12-small">
-      <span class="image fit"><img src="{{ relative.image }}" alt="" />
+      <span class="image fit"><img src="/static/images/relatives/{{ relative.image }}" alt="" />
         <div class="badge">{{ relative.birthday }}</div>
       </span>
     </div>
@@ -18,7 +18,7 @@
     <div class="col-6 col-12-small">
       <form method="post" action="#">
         <div class="col-6 col-12-xsmall">
-          <select name="sex" id="sex" value="{{ relative.sex }}">
+          <select name="sex" id="sex">
             {% if relative.sex == "" %}
             <option value="" selected></option>
             {% else %}

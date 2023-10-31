@@ -54,9 +54,6 @@ def read_relative(filename):
     meta = json.loads('{' + data[-2] + '}')
     relative.update(meta)
 
-  if 'image' in relative:
-    relative['image'] = '/static/images/relatives/' + relative['image']
-
   return relative
 
 def get_birthday(relative):
@@ -99,6 +96,39 @@ def read_all_relatives(max_posts=-1, reverse=True):
   if max_posts > 0:
     return relatives[0:max_posts]
   return relatives
+
+def write_relative(relative):
+  DIR = 'data/relatives/'
+  createDirIfNeeded(DIR)
+
+  filename = f'{relative["hash"]}.md'
+
+  def spouse_to_string(spouse):
+    if len(spouse) == 0:
+      return '[]'
+    if len(spouse) == 1:
+      return f'["{spouse[0]}"]'
+
+    s = ', '.join([f'"{sp}"' for sp in spouse])
+    return f"[{s}]"
+
+  with open(os.path.join(DIR, filename), mode='w') as file:
+    file.write('---\n')
+    file.write(f'"hash":         "{relative["hash"]}",\n')
+    file.write(f'"name":         "{relative["name"]}",\n')
+    file.write(f'"sex":          "{relative["sex"]}",\n')
+    file.write(f'"father":       "{relative["father"]}",\n')
+    file.write(f'"mother":       "{relative["mother"]}",\n')
+    file.write(f'"spouse":       {spouse_to_string(relative["spouse"])},\n')
+    file.write(f'"birthday":     "{relative["birthday"]}",\n')
+    file.write(f'"birthplace":   "{relative["birthplace"]}",\n')
+    file.write(f'"weddingDay":   "{relative["weddingDay"]}",\n')
+    file.write(f'"weddingPlace": "{relative["weddingPlace"]}",\n')
+    file.write(f'"dayOfDeath":   "{relative["dayOfDeath"]}",\n')
+    file.write(f'"placeOfDeath": "{relative["placeOfDeath"]}",\n')
+    file.write(f'"profession":   "{relative["profession"]}",\n')
+    file.write(f'"image":        "{relative["image"]}"\n')
+    file.write('---\n')
 
 def createDirIfNeeded(dir):
   if not os.path.exists(dir):
@@ -169,14 +199,33 @@ def relative(relative_hash):
     return render_template('relative.html', relative=relative)
   return render_template('404.html'), 404
 
-@app.route('/relatives/<relative_hash>/edit')
+@app.route('/relatives/<relative_hash>/edit', methods=['GET', 'POST'])
 def relative_edit(relative_hash):
   relatives = read_all_relatives()
   relative = [p for p in relatives if p['hash'] == relative_hash]
   if relative:
     relative = relative[0]
+  else:
+    return render_template('404.html'), 404
+
+  if request.method == 'GET':
     return render_template('relative_edit.html', relative=relative)
-  return render_template('404.html'), 404
+
+  relative['sex'] = request.form['sex']
+  relative['father'] = request.form['father']
+  relative['mother'] = request.form['mother']
+  relative['spouse'] = [s[1:-1].strip() for s in request.form['spouse'][1:-1].split(',')]
+  relative['birthday'] = request.form['birthday']
+  relative['birthplace'] = request.form['birthplace']
+  relative['weddingDay'] = request.form['weddingDay']
+  relative['weddingPlace'] = request.form['weddingPlace']
+  relative['dayOfDeath'] = request.form['dayOfDeath']
+  relative['placeOfDeath'] = request.form['placeOfDeath']
+  relative['profession'] = request.form['profession']
+
+  # TODO: Check all cross-references
+  write_relative(relative)
+  return redirect(url_for('relative', relative_hash=relative_hash))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

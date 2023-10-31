@@ -12,7 +12,7 @@
     {% for relative in relatives %}
     <article>
       <a href="/relatives/{{ relative.hash }}" class="image">
-        <img src="{{ relative.image }}" alt="" />
+        <img src="/static/images/relatives/{{ relative.image }}" alt="" />
         <div class="badge">
           {{ relative.birthday }}
         </div>

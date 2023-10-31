@@ -19,7 +19,7 @@
 			@include vendor('display', 'flex');
 			margin: 0 0 $gutter $gutter;
 			position: relative;
-			width: calc(50% - #{$gutter});
+			width: calc(33% - #{$gutter});
 
 			&:nth-child(2n - 1) {
 				margin-right: ($gutter * 0.5);
@@ -58,10 +58,10 @@
 					content: '';
 					display: block;
 					height: 7em;
-					left: 50%;
+					left: 33%;
 					margin: -3.5em 0 0 -3.5em;
 					position: absolute;
-					top: 50%;
+					top: 33%;
 					width: 7em;
 				}
 			}

@@ -281,20 +281,21 @@ def relative_edit(relative_hash):
       return redirect(url_for('relative', relative_hash=relative_hash))
 
   # Change all cross-references
-  for r in relatives:
-    need_to_be_updated = False
-    if r['father'] == relative_hash:
-      need_to_be_updated = True
-      r['father'] = new_hash
-    if r['mother'] == relative_hash:
-      need_to_be_updated = True
-      r['mother'] = new_hash
-    if relative_hash in r['spouse']:
-      need_to_be_updated = True
-      r['spouse'] = [s if s != relative_hash else new_hash for s in r['spouse']]
-    if need_to_be_updated:
-      write_relative(r)
-      flash(f'Info: Cross-references updated for "{r["hash"]}"')
+  if relative_hash != new_hash:
+    for r in relatives:
+      need_to_be_updated = False
+      if r['father'] == relative_hash:
+        need_to_be_updated = True
+        r['father'] = new_hash
+      if r['mother'] == relative_hash:
+        need_to_be_updated = True
+        r['mother'] = new_hash
+      if relative_hash in r['spouse']:
+        need_to_be_updated = True
+        r['spouse'] = [s if s != relative_hash else new_hash for s in r['spouse']]
+      if need_to_be_updated:
+        write_relative(r)
+        flash(f'Info: Cross-references updated for "{r["hash"]}"')
 
   if relative_hash != new_hash:
     relative['hash'] = new_hash

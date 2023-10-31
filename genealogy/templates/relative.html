@@ -26,9 +26,9 @@
       <span class="image fit"><img src="/static/images/relatives/{{ relative.image }}" alt="" />
         <div class="badge">
           {% if relative.dayOfDeath %}
-          {{ relative.birthday }} - {{ relative.dayOfDeath }}
+          * {{ relative.birthday }}</br>✝ {{ relative.dayOfDeath }}
           {% else %}
-          {{ relative.birthday }}
+          * {{ relative.birthday }}
           {% endif %}
         </div>
       </span>

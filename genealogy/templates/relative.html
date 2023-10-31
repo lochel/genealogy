@@ -5,32 +5,37 @@
 <!-- Content -->
 <section>
   <header class="main">
-    <h1>{{ relative.name }}</h1>
+    <h1>{{ relative.name }} <a href="/relatives/{{ relative.hash }}/edit" class="icon solid fa-edit"><span class="label">Edit</span></a></h1>
   </header>
 
-  <span class="image main">
-    <img src="{{ relative.image }}" alt="" />
-    <div class="badge">{{ relative.birthday }}</div>
-  </span>
+  <div class="row">
+    <div class="col-6 col-12-small">
+      <span class="image fit"><img src="{{ relative.image }}" alt="" />
+        <div class="badge">{{ relative.birthday }}</div>
+      </span>
+    </div>
 
-  <ul class="alt">
-    <li><b>sex:</b> {{ relative.sex }}</li>
-    <li><b>father:</b> <a href="/relatives/{{ relative.father }}">{{ get_relative_name(relative.father) }}</a></li>
-    <li><b>mother:</b> <a href="/relatives/{{ relative.mother }}">{{ get_relative_name(relative.mother) }}</a></li>
-    <li><b>spouse:</b>
-      {% for spouse in relative.spouse %}
-      <a href="/relatives/{{ spouse }}">{{ get_relative_name(spouse) }}</a>
-      {% endfor %}
-    </li>
-    <li><b>birthday:</b> {{ relative.birthday }}</li>
-    <li><b>birthplace:</b> {{ relative.birthplace }}</li>
-    <li><b>weddingDay:</b> {{ relative.weddingDay }}</li>
-    <li><b>weddingPlace:</b> {{ relative.weddingPlace }}</li>
-    <li><b>dayOfDeath:</b> {{ relative.dayOfDeath }}</li>
-    <li><b>placeOfDeath:</b> {{ relative.placeOfDeath }}</li>
-    <li><b>profession:</b> {{ relative.profession }}</li>
-  </ul>
+    <div class="col-6 col-12-small">
+      <ul class="alt">
+        <li><b>sex:</b> {{ relative.sex }}</li>
+        <li><b>father:</b> <a href="/relatives/{{ relative.father }}">{{ get_relative_name(relative.father) }}</a></li>
+        <li><b>mother:</b> <a href="/relatives/{{ relative.mother }}">{{ get_relative_name(relative.mother) }}</a></li>
+        <li><b>spouse:</b>
+          {% for spouse in relative.spouse %}
+          <a href="/relatives/{{ spouse }}">{{ get_relative_name(spouse) }}</a>
+          {% endfor %}
+        </li>
+        <li><b>birthday:</b> {{ relative.birthday }}</li>
+        <li><b>birthplace:</b> {{ relative.birthplace }}</li>
+        <li><b>weddingDay:</b> {{ relative.weddingDay }}</li>
+        <li><b>weddingPlace:</b> {{ relative.weddingPlace }}</li>
+        <li><b>dayOfDeath:</b> {{ relative.dayOfDeath }}</li>
+        <li><b>placeOfDeath:</b> {{ relative.placeOfDeath }}</li>
+        <li><b>profession:</b> {{ relative.profession }}</li>
+      </ul>
 
-  {{ relative.body | safe }}
+      {{ relative.body | safe }}
+    </div>
+  </div>
 </section>
 {% endblock %}

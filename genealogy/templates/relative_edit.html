@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% set title = relative.title %}
+
+{% block section %}
+<!-- Content -->
+<section>
+  <header class="main">
+    <h1>{{ relative.name }}</h1>
+  </header>
+
+  <div class="row">
+    <div class="col-6 col-12-small">
+      <span class="image fit"><img src="{{ relative.image }}" alt="" />
+        <div class="badge">{{ relative.birthday }}</div>
+      </span>
+    </div>
+
+    <div class="col-6 col-12-small">
+      <form method="post" action="#">
+        <div class="col-6 col-12-xsmall">
+          <select name="sex" id="sex" value="{{ relative.sex }}">
+            {% if relative.sex == "" %}
+            <option value="" selected></option>
+            {% else %}
+            <option value=""></option>
+            {% endif %}
+            {% if relative.sex == "male" %}
+            <option value="male" selected>male</option>
+            {% else %}
+            <option value="male">male</option>
+            {% endif %}
+            {% if relative.sex == "female" %}
+            <option value="female" selected>female</option>
+            {% else %}
+            <option value="female">female</option>
+            {% endif %}
+          </select>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="father" id="father" value="{{ relative.father }}" placeholder="father" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="mother" id="mother" value="{{ relative.mother }}" placeholder="mother" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="spouse" id="spouse" value="{{ relative.spouse }}" placeholder="spouse" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="birthday" id="birthday" value="{{ relative.birthday }}" placeholder="birthday" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="birthplace" id="birthplace" value="{{ relative.birthplace }}" placeholder="birthplace" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="weddingDay" id="weddingDay" value="{{ relative.weddingDay }}" placeholder="wedding day" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="weddingPlace" id="weddingPlace" value="{{ relative.weddingPlace }}" placeholder="wedding place" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="dayOfDeath" id="dayOfDeath" value="{{ relative.dayOfDeath }}" placeholder="day of death" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="placeOfDeath" id="placeOfDeath" value="{{ relative.placeOfDeath }}" placeholder="place of death" />
+          </div>
+          <!-- Break -->
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="profession" id="profession" value="{{ relative.profession }}" placeholder="profession" />
+          </div>
+          <!-- Break -->
+          <div class="col-12">
+            <textarea name="body" id="body" placeholder="Additional information" rows="8" maxlength="5000"></textarea>
+          </div>
+          <!-- Break -->
+          <div class="col-12">
+            <ul class="actions">
+              <li><input type="submit" value="Update" class="primary" /></li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {{ relative.body | safe }}
+</section>
+{% endblock %}

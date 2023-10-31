@@ -169,6 +169,15 @@ def relative(relative_hash):
     return render_template('relative.html', relative=relative)
   return render_template('404.html'), 404
 
+@app.route('/relatives/<relative_hash>/edit')
+def relative_edit(relative_hash):
+  relatives = read_all_relatives()
+  relative = [p for p in relatives if p['hash'] == relative_hash]
+  if relative:
+    relative = relative[0]
+    return render_template('relative_edit.html', relative=relative)
+  return render_template('404.html'), 404
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
   if request.method == 'GET':

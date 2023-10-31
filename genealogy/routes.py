@@ -57,17 +57,10 @@ def read_relative(filename):
   return relative
 
 def get_birthday(relative):
-  birthday = relative['birthday']
-  try:
-    if len(birthday.split('.')) == 3:
-      birthday = birthday.split('.')
-      return date(birthday[2], birthday[1], birthday[0])
-    if len(birthday.split('-')) == 3:
-      birthday = birthday.split('-')
-      return date(birthday[0], birthday[1], birthday[2])
-  except:
-    pass
-  return date.today()
+  birthday = relative['birthday'].split('.')
+  if len(birthday) == 3:
+    return f"{birthday[2]}-{birthday[1]}-{birthday[0]}"
+  return relative['birthday']
 
 def get_relative_name(hash):
   if not hash:
@@ -130,6 +123,23 @@ def write_relative(relative):
     file.write(f'"image":        "{relative["image"]}"\n')
     file.write('---\n')
 
+def empty_relative(hash):
+  relative = {'hash': hash,
+              'name': '',
+              'sex': '',
+              'father': '',
+              'mother': '',
+              'spouse': '',
+              'birthday': '',
+              'birthplace': '',
+              'weddingDay': '',
+              'weddingPlace': '',
+              'dayOfDeath': '',
+              'placeOfDeath': '',
+              'profession': '',
+              'image': ''}
+  return relative
+
 def createDirIfNeeded(dir):
   if not os.path.exists(dir):
     os.makedirs(dir)
@@ -172,7 +182,7 @@ def after_request(response):
 
 @app.route('/')
 def index():
-  relatives = read_all_relatives(4, reverse=True)
+  relatives = read_all_relatives(6, reverse=True)
   return render_template('index.html', relatives=relatives)
 
 @app.route('/generic')
@@ -196,8 +206,9 @@ def relative(relative_hash):
   relative = [p for p in relatives if p['hash'] == relative_hash]
   if relative:
     relative = relative[0]
-    return render_template('relative.html', relative=relative)
-  return render_template('404.html'), 404
+  else:
+    relative = empty_relative(relative_hash)
+  return render_template('relative.html', relative=relative)
 
 @app.route('/relatives/<relative_hash>/edit', methods=['GET', 'POST'])
 def relative_edit(relative_hash):
@@ -206,7 +217,7 @@ def relative_edit(relative_hash):
   if relative:
     relative = relative[0]
   else:
-    return render_template('404.html'), 404
+    relative = empty_relative(relative_hash)
 
   if request.method == 'GET':
     return render_template('relative_edit.html', relative=relative)

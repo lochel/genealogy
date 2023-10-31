@@ -1,0 +1,11 @@
+<header id="header">
+  <a href="{{ url_for('index') }}" class="logo"><strong>genealogy</strong>{% if not current_user.is_anonymous %} | {{ current_user.role }}{% endif %}</a>
+  <ul class="icons">
+    <li><a href="{{ url_for('contact') }}" class="icon solid fa-envelope"><span class="label">Contact</span></a></li>
+    {% if not current_user.is_anonymous %}
+    <li><a href="{{ url_for('logout') }}" class="icon solid fa-sign-out-alt"><span class="label">Logout</span></a></li>
+    {% else %}
+    <li><a href="{{ url_for('login') }}" class="icon solid fa-user"><span class="label">Login</span></a></li>
+    {% endif %}
+  </ul>
+</header>

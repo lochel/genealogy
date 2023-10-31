@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% set title = "Search Result" %}
+
+{% block section %}
+<!-- Content -->
+<section>
+  <header class="major">
+    <h2>Search result for "{{ query }}"</h2>
+  </header>
+
+  <header class="major">
+    <h2>Posts ({{ posts|length }})</h2>
+  </header>
+  <div class="posts">
+    {% for post in posts %}
+    <article>
+      <a href="/posts/{{ post.id }}" class="image">
+        <img src="{{ post.img }}" alt="" />
+        <div class="badge">
+          {{ post.date }}
+        </div>
+      </a>
+      <h3>{{ post.title }}</h3>
+      <p>{{ post.description | truncate(200, killwords=False, end='...') }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+{% if projects %}
+<section>
+  <header class="major">
+    <h2>Projects ({{ projects|length }})</h2>
+  </header>
+  <div class="posts">
+    {% for post in projects %}
+    <article>
+      <a href="/posts/{{ post.id }}" class="image">
+        <img src="{{ post.img }}" alt="" />
+        <div class="badge">
+          {{ post.date }}
+        </div>
+      </a>
+      <h3>{{ post.title }}</h3>
+      <p>{{ post.description | truncate(200, killwords=False, end='...') }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

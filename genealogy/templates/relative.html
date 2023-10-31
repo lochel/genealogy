@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% set title = relative.title %}
+
+{% block section %}
+<!-- Content -->
+<section>
+  <header class="main">
+    <h1>{{ relative.name }}</h1>
+  </header>
+
+  <span class="image main">
+    <img src="{{ relative.img }}" alt="" />
+    <div class="badge">{{ relative.birthday }}</div>
+  </span>
+
+  {% if relative.profession %}
+  <blockquote>{{ relative.profession }}</blockquote>
+  {% endif %}
+
+  {{ relative.body | safe }}
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% set title = "404" %}
+
+{% block section %}
+<section>
+  <div class="content">
+    <header">
+      <h1>404 - PAGE NOT FOUND</h1>
+    </header>
+    <span class="image main">
+      <img src="{{ url_for('static', filename='images/404.jpg') }}" alt="" />
+    </span>
+  </div>
+</section>
+{% endblock %}

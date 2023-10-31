@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% set title = "Direct Message" %}
+
+{% block section %}
+<section>
+  <div class="row">
+    <div class="col-6 col-12-small">
+      <header class="major">
+        <h2>Direct Message</h2>
+      </header>
+      <p>Your name and email address are optional and only required if you would like to be contacted.</p>
+      <form method="post" action="#">
+        <div class="row gtr-uniform">
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="name" id="name" value="" placeholder="Name" />
+          </div>
+          <div class="col-6 col-12-xsmall">
+            <input type="email" name="email" id="email" value="" placeholder="Email" />
+          </div>
+          <!-- Break -->
+          <div class="col-12">
+            <textarea name="message" id="message" placeholder="Enter your message" rows="8" maxlength="500"></textarea>
+          </div>
+          <!-- Break -->
+          <div class="col-12">
+            <ul class="actions">
+              <li><input type="submit" value="Send Message" class="primary" /></li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+    {% if users %}
+    <div class="col-6 col-12-small">
+      <header class="major">
+        <h2>User list</h2>
+      </header>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.rank }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if comments %}
+  <header class="major">
+    <h2>Comments</h2>
+  </header>
+  <div class="posts">
+    {% for comment in comments %}
+    <article>
+      <h3>{{ comment.date }}</h3>
+      <p>{{ comment.name }} &#60;{{ comment.email }}&#62;</h4>
+      <p>{{ comment.body | safe }}</p>
+    </article>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

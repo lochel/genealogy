@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% set title = "Relatives" %}
+
+{% block section %}
+<!-- Content -->
+<section>
+  <header class="major">
+    <h2>Relatives</h2>
+  </header>
+
+  <div class="posts">
+    {% for relative in relatives %}
+    <article>
+      <a href="/relatives/{{ relative.hash }}" class="image">
+        <img src="{{ relative.img }}" alt="" />
+        <div class="badge">
+          {{ relative.date }}
+        </div>
+      </a>
+      <h3>{{ relative.name }}</h3>
+      <p>{{ relative.description | truncate(200, killwords=False, end='...') }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

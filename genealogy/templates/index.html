@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block section %}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <section>
+    <h4>Notification</h4>
+    <ul class="alt">
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+{% endwith %}
+
+<!-- Banner -->
+<section id="banner">
+  <div class="content">
+    <header>
+      <h1>genealogy</h1>
+      <p>Embark on a Journey of Ancestral Exploration</p>
+    </header>
+    <p>Welcome to our genealogy web service, the perfect destination
+    for those seeking to embark on an extensive journey of ancestral
+    exploration. Our platform is your gateway to unearthing the rich
+    tapestry of your family history, and it offers you a unique
+    opportunity to connect with the past. As you delve into the depths
+    of your family's heritage, you'll be able to uncover the stories,
+    traditions, and moments that have left their indelible mark on
+    your identity. With powerful and user-friendly tools at your
+    disposal, you can trace the lineage of your ancestors, discover
+    hidden gems in your family tree, and forge connections with
+    relatives you never knew existed. Start this captivating voyage of
+    genealogical discovery today, and unlock the secrets of your
+    unique lineage.
+  </p>
+  </div>
+  <span class="image object">
+    <img src="/static/images/index.jpg" alt="" />
+  </span>
+</section>
+{% endblock %}

@@ -1,0 +1,47 @@
+<!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <section id="search" class="alt">
+      <form method="post" action="{{ url_for('search') }}">
+        <input type="text" name="query" id="query" placeholder="Search" />
+      </form>
+    </section>
+
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        {% if current_user.is_anonymous %}
+        <li><a class="icon solid fa-lock" href="{{ url_for('relatives') }}"> Relatives</a></li>
+        {% else %}
+        <li><a href="{{ url_for('relatives') }}">Relatives</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <!-- Section -->
+    <section>
+      <header class="major">
+        <h2>Get in touch</h2>
+      </header>
+      <ul class="contact">
+        <li class="icon solid fa-envelope"><a href="{{ url_for('contact') }}">Direct Message</a></li>
+      </ul>
+    </section>
+
+    <!-- Section -->
+    {% if not current_user.is_anonymous %}
+    <section>
+      <ul class="contact">
+        <li class="icon solid fa-sign-out-alt"><a href="{{ url_for('logout') }}">{{ current_user.name }}</a></li>
+      </ul>
+    </section>
+    {% endif %}
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+  </div>
+</div>

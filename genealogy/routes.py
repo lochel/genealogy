@@ -54,6 +54,9 @@ def read_relative(filename):
     meta = json.loads('{' + data[-2] + '}')
     relative.update(meta)
 
+  if 'image' in relative:
+    relative['image'] = '/static/images/relatives/' + relative['image']
+
   return relative
 
 def get_birthday(relative):

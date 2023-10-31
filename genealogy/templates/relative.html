@@ -15,11 +15,11 @@
 
   <ul class="alt">
     <li><b>sex:</b> {{ relative.sex }}</li>
-    <li><b>father:</b> <a href="/relatives/{{ relative.father }}">{{ relative.father }}</a></li>
-    <li><b>mother:</b> <a href="/relatives/{{ relative.mother }}">{{ relative.mother }}</a></li>
+    <li><b>father:</b> <a href="/relatives/{{ relative.father }}">{{ get_relative_name(relative.father) }}</a></li>
+    <li><b>mother:</b> <a href="/relatives/{{ relative.mother }}">{{ get_relative_name(relative.mother) }}</a></li>
     <li><b>spouse:</b>
       {% for spouse in relative.spouse %}
-      <a href="/relatives/{{ spouse }}">{{ spouse }}</a>
+      <a href="/relatives/{{ spouse }}">{{ get_relative_name(spouse) }}</a>
       {% endfor %}
     </li>
     <li><b>birthday:</b> {{ relative.birthday }}</li>

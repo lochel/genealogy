@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask
 import flask_login
 
@@ -12,3 +10,5 @@ login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
 from genealogy import routes
+
+app.jinja_env.globals.update(get_relative_name=routes.get_relative_name)

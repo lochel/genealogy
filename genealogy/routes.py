@@ -72,6 +72,16 @@ def get_birthday(relative):
     pass
   return date.today()
 
+def get_relative_name(hash):
+  if not hash:
+    return ''
+
+  try:
+    relative = read_relative(os.path.join('data/relatives/', hash + '.md'))
+    return relative['name']
+  except:
+    return 'Failed to resolve hash: ' + hash
+
 def read_all_relatives(max_posts=-1, reverse=True):
   relatives = []
 

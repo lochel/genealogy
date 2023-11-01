@@ -2,7 +2,8 @@ import ast
 import json
 import os
 import secrets
-from datetime import date, datetime
+import subprocess
+from datetime import datetime
 
 import flask_login
 import markdown
@@ -304,6 +305,84 @@ def relative_edit(relative_hash):
 
   write_relative(relative)
   return redirect(url_for('relative', relative_hash=relative_hash))
+
+def generateTexNode(relative, x, y):
+  template = r'''\node[draw=<[color]>!70!white, fill=white, line width=0.1cm, minimum width=4cm, minimum height=9cm, path picture={
+                 \node [draw=<[color]>!10!white, fill=<[color]>!10!white, rounded corners=0, text width=3.6cm, inner sep=0.2cm, minimum width=4cm, minimum height=3cm, anchor=north] at (0cm,-1.5cm) {\begin{dynminipage}<[name]>\\\gtrsymBorn~01.05.1930 in Münster\\\gtrsymMarried~23.09.1955 in Bielefeld\\<[profession]>\end{dynminipage}};
+                 \fill [fill overzoom image={../relatives/images/<[image]>}, rounded corners=0] (-2cm,-1.5cm) rectangle (2cm,4.5cm);
+                 }, rectangle, rounded corners=0.2cm] (<[id]>) at <[pos]> {};'''
+
+  color = 'black'
+  if relative['sex'] == 'male':
+    color = 'blue'
+  if relative['sex'] == 'female':
+    color = 'red'
+  template = template.replace('<[color]>', color)
+
+  template = template.replace('<[id]>',    f'id-{relative["hash"]}')
+  template = template.replace('<[pos]>',   f'({x}cm, {y}cm)')
+  template = template.replace('<[name]>',  r'\textbf{' + relative['name'] + r'}')
+  template = template.replace('<[image]>', relative['image'])
+
+  profession = r'\textit{' + relative['profession'] + r'}' if relative['profession'] else ''
+  template = template.replace('<[profession]>', profession)
+
+  return template
+
+@app.route('/generate/<relative_hash>')
+@flask_login.login_required
+def generate(relative_hash):
+  relatives = {}
+
+  # import all data
+  for root, _, files in os.walk('data/relatives/', topdown=False):
+    for name in files:
+      if name.endswith('.md'):
+        try:
+          relative = read_relative(os.path.join(root, name))
+        except:
+          pass
+        else:
+          relatives[relative['hash']] = relative
+
+
+  ego = relatives[relative_hash]
+
+  # get parents
+  NODES = ''
+  if ego['father']:
+    NODES += generateTexNode(relatives[ego['father']], 5, 26)
+  if ego['mother']:
+    NODES += generateTexNode(relatives[ego['mother']], 10, 26)
+  NODES += generateTexNode(ego, 7.5, 13)
+  i = 0
+  for p in ego['spouse']:
+    NODES += generateTexNode(relatives[p], 12.5 + i*5, 13)
+    i += 1
+  i = 0
+  for p in relatives.values():
+    if relative_hash in [p['father'], p['mother']]:
+      NODES += generateTexNode(p, 10 + i*5, 0)
+      i += 1
+
+  # get ego
+  HUBS = ''
+  # get children
+  CONNECTIONS = ''
+
+  with open('data/tex/template-family.tex', 'r') as templatefile:
+    template = templatefile.read()
+
+  with open(f"data/tex/{relative_hash}.tex", 'w') as writefile:
+    template = template.replace('%<<DEFINE-NODES>>', NODES)
+    template = template.replace('%<<DEFINE-HUBS>>', HUBS)
+    template = template.replace('%<<DEFINE-CONNECTIONS>>', CONNECTIONS)
+    writefile.write(template)
+
+  subprocess.call(['pdflatex', f'{relative_hash}.tex'], cwd='data/tex/')
+  subprocess.call(['pdftoppm', f'{relative_hash}.pdf', f'{relative_hash}', '-png'], cwd='data/tex/')
+  subprocess.call(['mv', f'{relative_hash}-1.png', f'../relatives/images/family/{relative_hash}.png'], cwd='data/tex/')
+  return 'Ok ' + relative_hash
 
 @app.route('/validate')
 @flask_login.login_required

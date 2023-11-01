@@ -23,34 +23,27 @@
 
   <div class="row">
     <div class="col-6 col-12-small">
-      <span class="image fit"><img src="/static/images/relatives/{{ relative.image }}" alt="" />
-        <div class="badge">
-          {% if relative.dayOfDeath %}
-          * {{ relative.birthday }}</br>✝ {{ relative.dayOfDeath }}
-          {% else %}
-          * {{ relative.birthday }}
-          {% endif %}
-        </div>
+      <span class="image fit"><img src="/static/images/relatives/family/{{ relative.hash }}.png" alt="" />
       </span>
     </div>
 
     <div class="col-6 col-12-small">
       <ul class="alt">
-        <li><b>sex:</b> {{ relative.sex }}</li>
-        <li><b>father:</b> <a href="/relatives/{{ relative.father }}">{{ get_relative_name(relative.father) }}</a></li>
-        <li><b>mother:</b> <a href="/relatives/{{ relative.mother }}">{{ get_relative_name(relative.mother) }}</a></li>
-        <li><b>spouse:</b>
+        {% if relative.sex %}<li><b>sex:</b> {{ relative.sex }}</li>{% endif %}
+        {% if relative.father %}<li><b>father:</b> <a href="/relatives/{{ relative.father }}">{{ get_relative_name(relative.father) }}</a></li>{% endif %}
+        {% if relative.mother %}<li><b>mother:</b> <a href="/relatives/{{ relative.mother }}">{{ get_relative_name(relative.mother) }}</a></li>{% endif %}
+        {% if relative.spouse %}<li><b>spouse:</b>
           {% for spouse in relative.spouse %}
           <a href="/relatives/{{ spouse }}">{{ get_relative_name(spouse) }}</a>
           {% endfor %}
-        </li>
-        <li><b>birthday:</b> {{ relative.birthday }}</li>
-        <li><b>birthplace:</b> {{ relative.birthplace }}</li>
-        <li><b>wedding day:</b> {{ relative.weddingDay }}</li>
-        <li><b>wedding place:</b> {{ relative.weddingPlace }}</li>
-        <li><b>day of death:</b> {{ relative.dayOfDeath }}</li>
-        <li><b>place of death:</b> {{ relative.placeOfDeath }}</li>
-        <li><b>profession:</b> {{ relative.profession }}</li>
+        </li>{% endif %}
+        {% if relative.birthday %}<li><b>birthday:</b> {{ relative.birthday }}</li>{% endif %}
+        {% if relative.birthplace %}<li><b>birthplace:</b> {{ relative.birthplace }}</li>{% endif %}
+        {% if relative.weddingDay %}<li><b>wedding day:</b> {{ relative.weddingDay }}</li>{% endif %}
+        {% if relative.weddingPlace %}<li><b>wedding place:</b> {{ relative.weddingPlace }}</li>{% endif %}
+        {% if relative.dayOfDeath %}<li><b>day of death:</b> {{ relative.dayOfDeath }}</li>{% endif %}
+        {% if relative.placeOfDeath %}<li><b>place of death:</b> {{ relative.placeOfDeath }}</li>{% endif %}
+        {% if relative.profession %}<li><b>profession:</b> {{ relative.profession }}</li>{% endif %}
       </ul>
 
       {{ relative.body | safe }}

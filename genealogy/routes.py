@@ -210,9 +210,11 @@ def relatives():
 @flask_login.login_required
 def relative(relative_hash):
   relatives = read_all_relatives()
+  children = [p['hash'] for p in relatives if p['father'] == relative_hash or p['mother'] == relative_hash]
   relative = [p for p in relatives if p['hash'] == relative_hash]
   if relative:
     relative = relative[0]
+    relative['children'] = children
   else:
     relative = empty_relative(relative_hash)
   return render_template('relative.html', relative=relative)
@@ -308,9 +310,10 @@ def relative_edit(relative_hash):
 
 def generateTexNode(relative, x, y):
   template = r'''\node[draw=<[color]>!70!white, fill=white, line width=0.1cm, minimum width=4cm, minimum height=9cm, path picture={
-                 \node [draw=<[color]>!10!white, fill=<[color]>!10!white, rounded corners=0, text width=3.6cm, inner sep=0.2cm, minimum width=4cm, minimum height=3cm, anchor=north] at (0cm,-1.5cm) {\begin{dynminipage}<[name]>\\\gtrsymBorn~01.05.1930 in Münster\\\gtrsymMarried~23.09.1955 in Bielefeld\\<[profession]>\end{dynminipage}};
-                 \fill [fill overzoom image={../relatives/images/<[image]>}, rounded corners=0] (-2cm,-1.5cm) rectangle (2cm,4.5cm);
-                 }, rectangle, rounded corners=0.2cm] (<[id]>) at <[pos]> {};'''
+\node [draw=<[color]>!10!white, fill=<[color]>!10!white, rounded corners=0, text width=3.6cm, inner sep=0.2cm, minimum width=4cm, minimum height=3cm, anchor=north] at (0cm,-1.5cm) {\begin{dynminipage}<[name]><[born]><[married]><[died]><[profession]>\end{dynminipage}};
+\fill [fill overzoom image={../relatives/images/<[image]>}, rounded corners=0] (-2cm,-1.5cm) rectangle (2cm,4.5cm);
+}, rectangle, rounded corners=0.2cm] (<[id]>) at <[pos]> {};
+'''
 
   color = 'black'
   if relative['sex'] == 'male':
@@ -324,7 +327,35 @@ def generateTexNode(relative, x, y):
   template = template.replace('<[name]>',  r'\textbf{' + relative['name'] + r'}')
   template = template.replace('<[image]>', relative['image'])
 
-  profession = r'\textit{' + relative['profession'] + r'}' if relative['profession'] else ''
+  born = ''
+  if relative['birthday'] or relative['birthplace']:
+    born += r'\\\gtrsymBorn'
+  if relative['birthday']:
+    born += f'~{relative["birthday"]}'
+  if relative['birthplace']:
+    born += f' in {relative["birthplace"]}'
+
+  married = ''
+  if relative['weddingDay'] or relative['weddingPlace']:
+    married += r'\\\gtrsymMarried'
+  if relative['weddingDay']:
+    married += f'~{relative["weddingDay"]}'
+  if relative['weddingPlace']:
+    married += f' in {relative["weddingPlace"]}'
+
+  died = ''
+  if relative['dayOfDeath'] or relative['placeOfDeath']:
+    died += r'\\\gtrsymDied'
+  if relative['dayOfDeath']:
+    died += f'~{relative["dayOfDeath"]}'
+  if relative['placeOfDeath']:
+    died += f' in {relative["placeOfDeath"]}'
+
+  template = template.replace('<[born]>', born)
+  template = template.replace('<[married]>', married)
+  template = template.replace('<[died]>', died)
+
+  profession = r'\\\textit{' + relative['profession'] + r'}' if relative['profession'] else ''
   template = template.replace('<[profession]>', profession)
 
   return template
@@ -347,6 +378,7 @@ def generate(relative_hash):
 
 
   ego = relatives[relative_hash]
+  children = []
 
   # get parents
   NODES = ''
@@ -363,12 +395,25 @@ def generate(relative_hash):
   for p in relatives.values():
     if relative_hash in [p['father'], p['mother']]:
       NODES += generateTexNode(p, 10 + i*5, 0)
+      children.append(p['hash'])
       i += 1
 
-  # get ego
   HUBS = ''
-  # get children
   CONNECTIONS = ''
+
+  i = 0
+  for p in ego['spouse']:
+    HUBS += r'\coordinate  (hub-' + relative_hash + r'-' + p + r') at (10cm, 6.5cm);'
+    i += 1
+  if ego['father'] and ego['mother']:
+    hub = f'hub-{ego["father"]}-{ego["mother"]}'
+    HUBS += f'\\coordinate ({hub}) at (7.5cm, 19.5cm);'
+    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + ego['father'] + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + ego['mother'] + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + relative_hash + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + ego['father'] + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + ego['mother'] + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + relative_hash + r')|-(' + hub + ');'
 
   with open('data/tex/template-family.tex', 'r') as templatefile:
     template = templatefile.read()

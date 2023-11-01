@@ -33,9 +33,18 @@
         {% if relative.father %}<li><b>father:</b> <a href="/relatives/{{ relative.father }}">{{ get_relative_name(relative.father) }}</a></li>{% endif %}
         {% if relative.mother %}<li><b>mother:</b> <a href="/relatives/{{ relative.mother }}">{{ get_relative_name(relative.mother) }}</a></li>{% endif %}
         {% if relative.spouse %}<li><b>spouse:</b>
-          {% for spouse in relative.spouse %}
-          <a href="/relatives/{{ spouse }}">{{ get_relative_name(spouse) }}</a>
-          {% endfor %}
+          <ul>
+            {% for spouse in relative.spouse %}
+            <li><a href="/relatives/{{ spouse }}">{{ get_relative_name(spouse) }}</a></li>
+            {% endfor %}
+          </ul>
+        </li>{% endif %}
+        {% if relative.children %}<li><b>children:</b>
+          <ul>
+            {% for child in relative.children %}
+            <li><a href="/relatives/{{ child }}">{{ get_relative_name(child) }}</a></li>
+            {% endfor %}
+          </ul>
         </li>{% endif %}
         {% if relative.birthday %}<li><b>birthday:</b> {{ relative.birthday }}</li>{% endif %}
         {% if relative.birthplace %}<li><b>birthplace:</b> {{ relative.birthplace }}</li>{% endif %}

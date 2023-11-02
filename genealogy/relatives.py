@@ -14,8 +14,10 @@ def read_relative(filename: str):
     return None
 
   data = text.split('---\n', maxsplit=2)
+
   body = data[-1]
   body_html = markdown.markdown(data[-1])
+
   relative = {'body': body, 'body_html': body_html}
 
   if len(data) == 3:
@@ -100,5 +102,7 @@ def empty_relative(hash):
               'dayOfDeath': '',
               'placeOfDeath': '',
               'profession': '',
-              'image': 'unknown.png'}
+              'image': 'unknown.png',
+              'body': '',
+              'body_html': ''}
   return relative

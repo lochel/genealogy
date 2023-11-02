@@ -2,19 +2,21 @@ import os
 import secrets
 
 import flask_login
-from flask import (abort, flash, redirect, render_template, request,
-                   send_from_directory, url_for)
+from flask import redirect, url_for
 
-from genealogy import app, dir, login_manager
-from genealogy.relatives import (empty_relative, read_all_relatives,
-                                 read_relative, write_relative)
+from genealogy import dir, login_manager
+
+
+class User(flask_login.UserMixin):
+  def __init__(self, name, email, role):
+    self.name = name
+    self.id = email
+    self.role = role
 
 def load_users():
   DIR = 'data/login/'
-  dir.createDirIfNeeded(DIR)
-
   filename = 'login.md'
-  open(os.path.join(DIR, filename), 'a').close() # make sure it exists
+  dir.createFileIfNeeded(DIR, filename)
 
   users = {}
   with open(os.path.join(DIR, filename)) as file:
@@ -28,20 +30,12 @@ def load_users():
 
 def add_new_user(name, email):
   DIR = 'data/login/'
-  dir.createDirIfNeeded(DIR)
-
   filename = 'login.md'
-  open(os.path.join(DIR, filename), 'a').close() # make sure it exists
+  dir.createFileIfNeeded(DIR, filename)
 
   password = secrets.token_hex()
-  with open(os.path.join(DIR, filename), "a") as file:
+  with open(os.path.join(DIR, filename), 'a') as file:
       file.write(f'inactive;{name};{email};{password}\n')
-
-class User(flask_login.UserMixin):
-  def __init__(self, name, email, role):
-    self.name = name
-    self.id = email
-    self.role = role
 
 @login_manager.user_loader
 def user_loader(email):

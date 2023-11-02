@@ -360,9 +360,7 @@ def generateTexNode(relative, x, y):
 
   return template
 
-@app.route('/generate/<relative_hash>')
-@flask_login.login_required
-def generate(relative_hash):
+def generate_tree(relative_hash):
   relatives = {}
 
   # import all data
@@ -378,10 +376,14 @@ def generate(relative_hash):
 
 
   ego = relatives[relative_hash]
-  children = []
+  children = [p['hash'] for p in relatives.values() if p['father'] == relative_hash or p['mother'] == relative_hash]
 
   # get parents
   NODES = ''
+  HUBS = ''
+  CONNECTIONS_W = ''
+  CONNECTIONS_B = ''
+
   if ego['father']:
     NODES += generateTexNode(relatives[ego['father']], 5, 26)
   if ego['mother']:
@@ -392,28 +394,31 @@ def generate(relative_hash):
     NODES += generateTexNode(relatives[p], 12.5 + i*5, 13)
     i += 1
   i = 0
-  for p in relatives.values():
-    if relative_hash in [p['father'], p['mother']]:
-      NODES += generateTexNode(p, 10 + i*5, 0)
-      children.append(p['hash'])
-      i += 1
-
-  HUBS = ''
-  CONNECTIONS = ''
+  for p in children:
+    NODES += generateTexNode(relatives[p], 10 + i*5, 0)
+    i += 1
+    hub = f'hub-{relatives[p]["father"]}-{relatives[p]["mother"]}'
+    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + p + r')|-(' + hub + ');'
+    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + p + r')|-(' + hub + ');'
 
   i = 0
   for p in ego['spouse']:
-    HUBS += r'\coordinate  (hub-' + relative_hash + r'-' + p + r') at (10cm, 6.5cm);'
+    hub = f'hub-{relative_hash}-{p}'
+    HUBS += f'\\coordinate ({hub}) at ({10+i*5}cm, 6.5cm);'
+    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + relative_hash + r')|-(' + hub + ');'
+    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + p + r')|-(' + hub + ');'
+    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + relative_hash + r')|-(' + hub + ');'
+    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + p + r')|-(' + hub + ');'
     i += 1
   if ego['father'] and ego['mother']:
     hub = f'hub-{ego["father"]}-{ego["mother"]}'
     HUBS += f'\\coordinate ({hub}) at (7.5cm, 19.5cm);'
-    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + ego['father'] + r')|-(' + hub + ');'
-    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + ego['mother'] + r')|-(' + hub + ');'
-    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + relative_hash + r')|-(' + hub + ');'
-    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + ego['father'] + r')|-(' + hub + ');'
-    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + ego['mother'] + r')|-(' + hub + ');'
-    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + relative_hash + r')|-(' + hub + ');'
+    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + ego['father'] + r')|-(' + hub + ');'
+    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + ego['mother'] + r')|-(' + hub + ');'
+    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + relative_hash + r')|-(' + hub + ');'
+    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + ego['father'] + r')|-(' + hub + ');'
+    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + ego['mother'] + r')|-(' + hub + ');'
+    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + relative_hash + r')|-(' + hub + ');'
 
   with open('data/tex/template-family.tex', 'r') as templatefile:
     template = templatefile.read()
@@ -421,13 +426,26 @@ def generate(relative_hash):
   with open(f"data/tex/{relative_hash}.tex", 'w') as writefile:
     template = template.replace('%<<DEFINE-NODES>>', NODES)
     template = template.replace('%<<DEFINE-HUBS>>', HUBS)
-    template = template.replace('%<<DEFINE-CONNECTIONS>>', CONNECTIONS)
+    template = template.replace('%<<DEFINE-CONNECTIONS>>', CONNECTIONS_W+CONNECTIONS_B)
     writefile.write(template)
 
   subprocess.call(['pdflatex', f'{relative_hash}.tex'], cwd='data/tex/')
   subprocess.call(['pdftoppm', f'{relative_hash}.pdf', f'{relative_hash}', '-png'], cwd='data/tex/')
   subprocess.call(['mv', f'{relative_hash}-1.png', f'../relatives/images/family/{relative_hash}.png'], cwd='data/tex/')
+
+@app.route('/generate/<relative_hash>')
+@flask_login.login_required
+def generate(relative_hash):
+  generate_tree(relative_hash)
   return 'Ok ' + relative_hash
+
+@app.route('/generate')
+@flask_login.login_required
+def generate_all():
+  relatives = read_all_relatives()
+  for p in relatives:
+    generate_tree(p['hash'])
+  return 'Ok'
 
 @app.route('/validate')
 @flask_login.login_required

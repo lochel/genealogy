@@ -381,8 +381,7 @@ def generate_tree(relative_hash):
   # get parents
   NODES = ''
   HUBS = ''
-  CONNECTIONS_W = ''
-  CONNECTIONS_B = ''
+  CONNECTIONS = ''
 
   if ego['father']:
     NODES += generateTexNode(relatives[ego['father']], 5, 26)
@@ -398,27 +397,29 @@ def generate_tree(relative_hash):
     NODES += generateTexNode(relatives[p], 10 + i*5, 0)
     i += 1
     hub = f'hub-{relatives[p]["father"]}-{relatives[p]["mother"]}'
-    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + p + r')|-(' + hub + ');'
-    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + p + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + p + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + p + r')|-(' + hub + ');'
 
   i = 0
   for p in ego['spouse']:
     hub = f'hub-{relative_hash}-{p}'
-    HUBS += f'\\coordinate ({hub}) at ({10+i*5}cm, 6.5cm);'
-    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + relative_hash + r')|-(' + hub + ');'
-    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + p + r')|-(' + hub + ');'
-    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + relative_hash + r')|-(' + hub + ');'
-    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + p + r')|-(' + hub + ');'
+    HUBS += f'\\coordinate ({hub}) at ({10+i*5}cm, {6.5+0.5*i}cm);'
+    hub = f'hub-{p}-{relative_hash}'
+    HUBS += f'\\coordinate ({hub}) at ({10+i*5}cm, {6.5+0.5*i}cm);'
+    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + relative_hash + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + p + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + relative_hash + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + p + r')|-(' + hub + ');'
     i += 1
   if ego['father'] and ego['mother']:
     hub = f'hub-{ego["father"]}-{ego["mother"]}'
     HUBS += f'\\coordinate ({hub}) at (7.5cm, 19.5cm);'
-    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + ego['father'] + r')|-(' + hub + ');'
-    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + ego['mother'] + r')|-(' + hub + ');'
-    CONNECTIONS_W += r'\draw[line width=0.4cm, white] (id-' + relative_hash + r')|-(' + hub + ');'
-    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + ego['father'] + r')|-(' + hub + ');'
-    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + ego['mother'] + r')|-(' + hub + ');'
-    CONNECTIONS_B += r'\draw[line width=0.2cm, black] (id-' + relative_hash + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + ego['father'] + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + ego['mother'] + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.4cm, white] (id-' + relative_hash + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + ego['father'] + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + ego['mother'] + r')|-(' + hub + ');'
+    CONNECTIONS += r'\draw[line width=0.2cm, black] (id-' + relative_hash + r')|-(' + hub + ');'
 
   with open('data/tex/template-family.tex', 'r') as templatefile:
     template = templatefile.read()
@@ -426,7 +427,7 @@ def generate_tree(relative_hash):
   with open(f"data/tex/{relative_hash}.tex", 'w') as writefile:
     template = template.replace('%<<DEFINE-NODES>>', NODES)
     template = template.replace('%<<DEFINE-HUBS>>', HUBS)
-    template = template.replace('%<<DEFINE-CONNECTIONS>>', CONNECTIONS_W+CONNECTIONS_B)
+    template = template.replace('%<<DEFINE-CONNECTIONS>>', CONNECTIONS)
     writefile.write(template)
 
   subprocess.call(['pdflatex', f'{relative_hash}.tex'], cwd='data/tex/')

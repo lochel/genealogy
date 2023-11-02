@@ -306,6 +306,14 @@ def relative_edit(relative_hash):
     relative_hash = relative['hash']
 
   write_relative(relative)
+
+  generate_tree(relative['hash'])
+  if relative['father']:
+    generate_tree(relative['father'])
+  if relative['mother']:
+    generate_tree(relative['mother'])
+  for s in relative['spouse']:
+    generate_tree(s)
   return redirect(url_for('relative', relative_hash=relative_hash))
 
 def generateTexNode(relative, x, y):

@@ -32,6 +32,7 @@ def write_relative(relative: dict):
 
   filename = f'{relative["hash"]}.md'
 
+  spouse = str(relative["spouse"]).replace("'", '"')
   with open(os.path.join(DIR, filename), mode='w') as file:
     file.write('---\n')
     file.write(f'"hash":         "{relative["hash"]}",\n')
@@ -39,7 +40,7 @@ def write_relative(relative: dict):
     file.write(f'"sex":          "{relative["sex"]}",\n')
     file.write(f'"father":       "{relative["father"]}",\n')
     file.write(f'"mother":       "{relative["mother"]}",\n')
-    file.write(f'"spouse":       {str(relative["spouse"])},\n')
+    file.write(f'"spouse":       {spouse},\n')
     file.write(f'"birthday":     "{relative["birthday"]}",\n')
     file.write(f'"birthplace":   "{relative["birthplace"]}",\n')
     file.write(f'"weddingDay":   "{relative["weddingDay"]}",\n')

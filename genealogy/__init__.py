@@ -10,5 +10,6 @@ login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
 from genealogy import routes
+from genealogy.relatives import get_relative_name
 
-app.jinja_env.globals.update(get_relative_name=routes.get_relative_name)
+app.jinja_env.globals.update(get_relative_name=get_relative_name)

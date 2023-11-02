@@ -88,6 +88,7 @@ def relative_edit(relative_hash):
   relative['dayOfDeath'] = request.form['dayOfDeath']
   relative['placeOfDeath'] = request.form['placeOfDeath']
   relative['profession'] = request.form['profession']
+  relative['body'] = request.form['body']
 
   # Check that the new hash isn't already used
   if relative_hash != new_hash:

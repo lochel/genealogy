@@ -91,7 +91,7 @@
           </div>
           <!-- Break -->
           <div class="col-12">
-            <textarea name="body" id="body" placeholder="Additional information" rows="8" maxlength="5000"></textarea>
+            <textarea name="body" id="body" placeholder="Additional information" rows="8" maxlength="5000">{{ relative.body }}</textarea>
           </div>
           <!-- Break -->
           <div class="col-12">
@@ -103,7 +103,5 @@
       </form>
     </div>
   </div>
-
-  {{ relative.body | safe }}
 </section>
 {% endblock %}

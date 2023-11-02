@@ -55,7 +55,7 @@
         {% if relative.profession %}<li><b>profession:</b> {{ relative.profession }}</li>{% endif %}
       </ul>
 
-      {{ relative.body | safe }}
+      {{ relative.body_html | safe }}
     </div>
   </div>
 </section>

@@ -72,7 +72,7 @@ def generate_tree(relative_hash):
 
 
   ego = relatives[relative_hash]
-  children = [p['hash'] for p in values() if p['father'] == relative_hash or p['mother'] == relative_hash]
+  children = [p['hash'] for p in relatives.values() if p['father'] == relative_hash or p['mother'] == relative_hash]
 
   # get parents
   NODES = ''

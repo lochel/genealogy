@@ -6,7 +6,7 @@ import markdown
 from genealogy import dir
 
 
-def read_relative(filename):
+def read_relative(filename: str):
   try:
     with open(filename, 'r') as f:
       text = f.read()
@@ -14,14 +14,40 @@ def read_relative(filename):
     return None
 
   data = text.split('---\n', maxsplit=2)
-  body = markdown.markdown(data[-1])
-  relative = {'body': body}
+  body = data[-1]
+  body_html = markdown.markdown(data[-1])
+  relative = {'body': body, 'body_html': body_html}
 
   if len(data) == 3:
     meta = json.loads('{' + data[-2] + '}')
     relative.update(meta)
 
   return relative
+
+def write_relative(relative: dict):
+  DIR = 'data/relatives/'
+  dir.createDirIfNeeded(DIR)
+
+  filename = f'{relative["hash"]}.md'
+
+  with open(os.path.join(DIR, filename), mode='w') as file:
+    file.write('---\n')
+    file.write(f'"hash":         "{relative["hash"]}",\n')
+    file.write(f'"name":         "{relative["name"]}",\n')
+    file.write(f'"sex":          "{relative["sex"]}",\n')
+    file.write(f'"father":       "{relative["father"]}",\n')
+    file.write(f'"mother":       "{relative["mother"]}",\n')
+    file.write(f'"spouse":       {str(relative["spouse"])},\n')
+    file.write(f'"birthday":     "{relative["birthday"]}",\n')
+    file.write(f'"birthplace":   "{relative["birthplace"]}",\n')
+    file.write(f'"weddingDay":   "{relative["weddingDay"]}",\n')
+    file.write(f'"weddingPlace": "{relative["weddingPlace"]}",\n')
+    file.write(f'"dayOfDeath":   "{relative["dayOfDeath"]}",\n')
+    file.write(f'"placeOfDeath": "{relative["placeOfDeath"]}",\n')
+    file.write(f'"profession":   "{relative["profession"]}",\n')
+    file.write(f'"image":        "{relative["image"]}"\n')
+    file.write('---\n')
+    file.write(relative['body'])
 
 def get_birthday(relative):
   birthday = relative['birthday'].split('.')
@@ -59,39 +85,6 @@ def read_all_relatives(max_posts=-1, reverse=True):
   if max_posts > 0:
     return relatives[0:max_posts]
   return relatives
-
-def write_relative(relative):
-  DIR = 'data/relatives/'
-  dir.createDirIfNeeded(DIR)
-
-  filename = f'{relative["hash"]}.md'
-
-  def spouse_to_string(spouse):
-    if len(spouse) == 0:
-      return '[]'
-    if len(spouse) == 1:
-      return f'["{spouse[0]}"]'
-
-    s = ', '.join([f'"{sp}"' for sp in spouse])
-    return f"[{s}]"
-
-  with open(os.path.join(DIR, filename), mode='w') as file:
-    file.write('---\n')
-    file.write(f'"hash":         "{relative["hash"]}",\n')
-    file.write(f'"name":         "{relative["name"]}",\n')
-    file.write(f'"sex":          "{relative["sex"]}",\n')
-    file.write(f'"father":       "{relative["father"]}",\n')
-    file.write(f'"mother":       "{relative["mother"]}",\n')
-    file.write(f'"spouse":       {spouse_to_string(relative["spouse"])},\n')
-    file.write(f'"birthday":     "{relative["birthday"]}",\n')
-    file.write(f'"birthplace":   "{relative["birthplace"]}",\n')
-    file.write(f'"weddingDay":   "{relative["weddingDay"]}",\n')
-    file.write(f'"weddingPlace": "{relative["weddingPlace"]}",\n')
-    file.write(f'"dayOfDeath":   "{relative["dayOfDeath"]}",\n')
-    file.write(f'"placeOfDeath": "{relative["placeOfDeath"]}",\n')
-    file.write(f'"profession":   "{relative["profession"]}",\n')
-    file.write(f'"image":        "{relative["image"]}"\n')
-    file.write('---\n')
 
 def empty_relative(hash):
   relative = {'hash': hash,

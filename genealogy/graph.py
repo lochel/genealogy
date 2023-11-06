@@ -126,6 +126,6 @@ def generate_tree(relative_hash):
     template = template.replace('%<<DEFINE-CONNECTIONS>>', CONNECTIONS)
     writefile.write(template)
 
-  subprocess.call(['pdflatex', f'{relative_hash}.tex'], cwd='data/tex/')
-  subprocess.call(['pdftoppm', f'{relative_hash}.pdf', f'{relative_hash}', '-png'], cwd='data/tex/')
-  subprocess.call(['mv', f'{relative_hash}-1.png', f'../relatives/images/family/{relative_hash}.png'], cwd='data/tex/')
+  subprocess.call(['/usr/bin/pdflatex', f'{relative_hash}.tex'], cwd='data/tex/')
+  subprocess.call(['/usr/bin/pdftoppm', f'{relative_hash}.pdf', f'{relative_hash}', '-png'], cwd='data/tex/')
+  subprocess.call(['/usr/bin/mv', f'{relative_hash}-1.png', f'../relatives/images/family/{relative_hash}.png'], cwd='data/tex/')

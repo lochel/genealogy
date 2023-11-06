@@ -57,7 +57,7 @@ def relative(relative_hash):
   if ego:
     ego = ego[0]
     children = [p['hash'] for p in relatives if p['father'] == relative_hash or p['mother'] == relative_hash]
-    siblings = [p['hash'] for p in relatives if (ego['father'] and p['father'] == ego['father']) or (ego['mother'] and p['mother'] == ego['mother'])]
+    siblings = [p['hash'] for p in relatives if ((ego['father'] and p['father'] == ego['father']) or (ego['mother'] and p['mother'] == ego['mother'])) and p['hash'] != relative_hash]
     ego['children'] = children
     ego['siblings'] = siblings
   else:

@@ -1,18 +1,17 @@
 import ast
 import os
-import subprocess
 from datetime import datetime
 
 import flask_login
-from flask import (abort, flash, redirect, render_template, request,
+from flask import (Flask, flash, redirect, render_template, request,
                    send_from_directory, url_for)
+from werkzeug.utils import secure_filename
 
 from genealogy import app, dir, login_manager
+from genealogy.graph import generate_tree
 from genealogy.relatives import (empty_relative, read_all_relatives,
                                  read_relative, write_relative)
-from genealogy.user import (User, add_new_user, load_users)
-
-from genealogy.graph import generate_tree
+from genealogy.user import User, add_new_user, load_users
 
 
 @app.after_request
@@ -62,6 +61,38 @@ def relative(relative_hash):
     relative = empty_relative(relative_hash)
   return render_template('relative.html', relative=relative)
 
+def allowed_file(filename):
+  ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+  return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/img', methods=['GET', 'POST'])
+def upload_file():
+  if request.method == 'GET':
+    return '''
+      <!doctype html>
+      <title>Upload new File</title>
+      <h1>Upload new File</h1>
+      <form method=post enctype=multipart/form-data>
+        <input type=file name=file>
+        <input type=submit value=Update>
+      </form>
+      '''
+
+  # check if the post request has the file part
+  if 'file' not in request.files:
+    flash('No file part')
+    return redirect(request.url)
+  file = request.files['file']
+  # if user does not select file, browser also
+  # submit an empty part without filename
+  if file.filename == '':
+    flash('No selected file')
+    return redirect(request.url)
+  if file and allowed_file(file.filename):
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    return redirect(request.url)
+
 @app.route('/relatives/<relative_hash>/edit', methods=['GET', 'POST'])
 @flask_login.login_required
 def relative_edit(relative_hash):
@@ -89,6 +120,24 @@ def relative_edit(relative_hash):
   relative['placeOfDeath'] = request.form['placeOfDeath']
   relative['profession'] = request.form['profession']
   relative['body'] = request.form['body']
+
+  # check if the post request has the file part
+  if 'file' not in request.files:
+    flash('No file part; ' + str(request.files))
+  else:
+    file = request.files['file']
+    # if user does not select file, browser also
+    # submit an empty part without filename
+    if file.filename == '':
+      flash('No selected file')
+    elif file and allowed_file(file.filename):
+      try:
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], relative['image']))
+      except:
+        flash('Failed to delete old image')
+      filename = secure_filename(file.filename)
+      file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+      relative['image'] = filename
 
   # Check that the new hash isn't already used
   if relative_hash != new_hash:

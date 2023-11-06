@@ -22,7 +22,7 @@
     </div>
 
     <div class="col-6 col-12-small">
-      <form method="post" action="#">
+      <form method="post" action="#" enctype="multipart/form-data">
         <div class="col-6 col-12-xsmall">
           <div class="col-6 col-12-xsmall">
             <input type="text" name="hash" id="hash" value="{{ relative.hash }}" placeholder="hash" />
@@ -95,8 +95,12 @@
           </div>
           <!-- Break -->
           <div class="col-12">
+            <input type="file" value="file"/>
+          </div>
+          <!-- Break -->
+          <div class="col-12">
             <ul class="actions">
-              <li><input type="submit" value="Update" class="primary" /></li>
+              <li><input type="submit" value="Save" class="primary" /></li>
             </ul>
           </div>
         </div>

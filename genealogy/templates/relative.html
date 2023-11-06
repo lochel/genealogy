@@ -18,7 +18,7 @@
 <!-- Content -->
 <section>
   <header class="main">
-    <h1>{{ relative.name }} <a href="/relatives/{{ relative.hash }}/edit" class="icon solid fa-edit"><span class="label">Edit</span></a></h1>
+    <h1>{{ relative.name }} <a href="/relatives/{{ relative.hash }}/edit" class="icon solid fa-edit"><span class="label">Edit</span></a><a href="/relatives/{{ relative.hash }}/update" class="icon solid fa-redo"><span class="label">Update</span></a></h1>
   </header>
 
   <div class="row">
@@ -43,6 +43,13 @@
           <ul>
             {% for child in relative.children %}
             <li><a href="/relatives/{{ child }}">{{ get_relative_name(child) }}</a></li>
+            {% endfor %}
+          </ul>
+        </li>{% endif %}
+        {% if relative.siblings %}<li><b>siblings:</b>
+          <ul>
+            {% for sibling in relative.siblings %}
+            <li><a href="/relatives/{{ sibling }}">{{ get_relative_name(sibling) }}</a></li>
             {% endfor %}
           </ul>
         </li>{% endif %}

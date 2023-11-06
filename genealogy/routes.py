@@ -53,14 +53,16 @@ def relatives():
 @flask_login.login_required
 def relative(relative_hash):
   relatives = read_all_relatives()
-  children = [p['hash'] for p in relatives if p['father'] == relative_hash or p['mother'] == relative_hash]
-  relative = [p for p in relatives if p['hash'] == relative_hash]
-  if relative:
-    relative = relative[0]
-    relative['children'] = children
+  ego = [p for p in relatives if p['hash'] == relative_hash]
+  if ego:
+    ego = ego[0]
+    children = [p['hash'] for p in relatives if p['father'] == relative_hash or p['mother'] == relative_hash]
+    siblings = [p['hash'] for p in relatives if (ego['father'] and p['father'] == ego['father']) or (ego['mother'] and p['mother'] == ego['mother'])]
+    ego['children'] = children
+    ego['siblings'] = siblings
   else:
-    relative = empty_relative(relative_hash)
-  return render_template('relative.html', relative=relative)
+    ego = empty_relative(relative_hash)
+  return render_template('relative.html', relative=ego)
 
 @app.route('/relatives/<relative_hash>/edit', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -152,6 +154,29 @@ def relative_edit(relative_hash):
   write_relative(relative)
 
   generate_tree(relative['hash'])
+  return redirect(url_for('relative', relative_hash=relative_hash))
+
+@app.route('/relatives/<relative_hash>/update')
+@flask_login.login_required
+def relative_update(relative_hash):
+  relatives = read_all_relatives()
+  ego = [p for p in relatives if p['hash'] == relative_hash]
+  if ego:
+    ego = ego[0]
+  else:
+    return render_template('404.html'), 404
+
+  children = [p['hash'] for p in relatives if p['father'] == relative_hash or p['mother'] == relative_hash]
+
+  generate_tree(ego['hash'])
+  if ego['father']:
+    generate_tree(ego['father'])
+  if ego['mother']:
+    generate_tree(ego['mother'])
+  for spouse in ego['spouse']:
+    generate_tree(spouse)
+  for child in children:
+    generate_tree(child)
   return redirect(url_for('relative', relative_hash=relative_hash))
 
 @app.route('/generate/<relative_hash>')

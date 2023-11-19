@@ -250,6 +250,23 @@ def login():
     flash('Bad login')
   return redirect(url_for('login'))
 
+@app.route('/login/<token>')
+def login_with_token(token):
+  users = load_users()
+  for email in users:
+    name = users[email]['name']
+    role = users[email]['role']
+    password = users[email]['password']
+    if password == token:
+      if role == 'inactive':
+        flash('User is not yet activated')
+      else:
+        user = User(name, email, role)
+        flask_login.login_user(user)
+        return redirect(url_for('relatives'))
+  flash('Bad login')
+  return redirect(url_for('login'))
+
 @app.route('/signup', methods=['POST'])
 def signup():
   if not request.method == 'POST':
